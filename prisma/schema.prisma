@@ -1,0 +1,101 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlserver"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  age       Int?
+  gender    String?
+  avatar    String?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  healthRecords    HealthRecord[]
+  financeRecords   FinanceRecord[]
+  notes           Note[]
+  translations    Translation[]
+
+  @@map("users")
+}
+
+model HealthRecord {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  date      DateTime
+  weight    Float?
+  height    Float?
+  calories  Int?
+  sleep     Int?
+  exercise  String?
+  advice    String?
+  imageUrl  String?  @map("image_url")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("health_records")
+}
+
+model FinanceRecord {
+  id          String   @id @default(cuid())
+  userId      String   @map("user_id")
+  category    String
+  amount      Float
+  note        String?
+  date        DateTime
+  type        String   // 'income' or 'expense'
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("finance_records")
+}
+
+model Note {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  title     String
+  content   String
+  tags      String?   // JSON string for tags array
+  isVoice   Boolean  @default(false) @map("is_voice")
+  audioUrl  String?  @map("audio_url")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notes")
+}
+
+model Translation {
+  id          String   @id @default(cuid())
+  userId      String   @map("user_id")
+  inputText   String   @map("input_text")
+  outputText  String   @map("output_text")
+  fromLang    String   @map("from_lang")
+  toLang      String   @map("to_lang")
+  isVoice     Boolean  @default(false) @map("is_voice")
+  audioUrl    String?  @map("audio_url")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("translations")
+}
+

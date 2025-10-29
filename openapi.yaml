@@ -1,0 +1,328 @@
+openapi: 3.1.0
+info:
+  title: AURA Backend API
+  version: 1.0.0
+  description: |
+    AURA - AI Universal Real-life Assistant Backend API Documentation
+    
+    Professional API documentation for AURA ecosystem including Authentication, Health Management, Finance Tracking, Notes, and AI-powered Translation services.
+  contact:
+    name: AURA Development Team
+    email: dev@aura.ai
+    url: https://aura.ai
+  license:
+    name: MIT License
+    url: https://opensource.org/licenses/MIT
+  termsOfService: https://aura.ai/terms
+
+servers:
+  - url: https://api.aura.ai
+    description: Production Server - AURA AI Platform
+  - url: http://localhost:5000
+    description: Development Server - Local Development
+  - url: https://staging-api.aura.ai
+    description: Staging Server - Pre-production Testing
+
+tags:
+  - name: Authentication
+    description: User authentication and authorization endpoints
+    externalDocs:
+      description: Find out more about AURA authentication
+      url: https://docs.aura.ai/authentication
+  - name: Health Management
+    description: Health records, analysis, and wellness tracking
+    externalDocs:
+      description: Health API documentation
+      url: https://docs.aura.ai/health
+  - name: Finance Management
+    description: Personal finance tracking and analysis
+    externalDocs:
+      description: Finance API documentation
+      url: https://docs.aura.ai/finance
+  - name: Notes Management
+    description: Digital notes, voice notes, and content management
+    externalDocs:
+      description: Notes API documentation
+      url: https://docs.aura.ai/notes
+  - name: Translation Services
+    description: AI-powered translation and language services
+    externalDocs:
+      description: Translation API documentation
+      url: https://docs.aura.ai/translation
+  - name: AI Analysis
+    description: AI-powered analysis and insights
+    externalDocs:
+      description: AI Analysis documentation
+      url: https://docs.aura.ai/ai-analysis
+
+paths:
+  /api/v1/auth/register:
+    post:
+      summary: Register a new user
+      tags: [Authentication]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - email
+                - password
+              properties:
+                name:
+                  type: string
+                  description: User full name
+                email:
+                  type: string
+                  format: email
+                  description: User email address
+                password:
+                  type: string
+                  minLength: 6
+                  description: User password
+                age:
+                  type: integer
+                  description: User age
+                gender:
+                  type: string
+                  enum: [Nam, Nữ, Khác]
+                  description: User gender
+      responses:
+        '201':
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  data:
+                    type: object
+                    properties:
+                      user:
+                        $ref: '#/components/schemas/User'
+                      token:
+                        type: string
+                        description: JWT token
+        '400':
+          description: Validation error or email already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/v1/auth/login:
+    post:
+      summary: Login user
+      tags: [Authentication]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                  description: User email address
+                password:
+                  type: string
+                  description: User password
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  data:
+                    type: object
+                    properties:
+                      user:
+                        $ref: '#/components/schemas/User'
+                      token:
+                        type: string
+                        description: JWT token
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/v1/health/records:
+    get:
+      summary: Get health records
+      tags: [Health Management]
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 10
+          description: Number of records to return
+        - in: query
+          name: offset
+          schema:
+            type: integer
+            default: 0
+          description: Number of records to skip
+        - in: query
+          name: startDate
+          schema:
+            type: string
+            format: date
+          description: Start date filter
+        - in: query
+          name: endDate
+          schema:
+            type: string
+            format: date
+          description: End date filter
+      responses:
+        '200':
+          description: Health records retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  data:
+                    type: object
+                    properties:
+                      records:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/HealthRecord'
+                      total:
+                        type: integer
+                        description: Total number of records
+                      limit:
+                        type: integer
+                      offset:
+                        type: integer
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT Authorization header using the Bearer scheme
+
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          description: User unique identifier
+        name:
+          type: string
+          description: User full name
+        email:
+          type: string
+          format: email
+          description: User email address
+        age:
+          type: integer
+          description: User age
+        gender:
+          type: string
+          enum: [Nam, Nữ, Khác]
+          description: User gender
+        avatar:
+          type: string
+          description: User avatar URL
+        createdAt:
+          type: string
+          format: date-time
+          description: User creation timestamp
+        updatedAt:
+          type: string
+          format: date-time
+          description: User last update timestamp
+
+    HealthRecord:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Health record unique identifier
+        userId:
+          type: string
+          description: User ID who owns this record
+        date:
+          type: string
+          format: date-time
+          description: Record date
+        weight:
+          type: number
+          format: float
+          description: Weight in kg
+        height:
+          type: number
+          format: float
+          description: Height in cm
+        calories:
+          type: integer
+          description: Daily calories consumed
+        sleep:
+          type: integer
+          description: Sleep hours
+        exercise:
+          type: string
+          description: Exercise description
+        advice:
+          type: string
+          description: Health advice
+        imageUrl:
+          type: string
+          description: Health image URL
+        createdAt:
+          type: string
+          format: date-time
+          description: Record creation timestamp
+
+    Error:
+      type: object
+      properties:
+        status:
+          type: string
+          example: error
+        message:
+          type: string
+          description: Error message
+        stack:
+          type: string
+          description: Error stack trace (development only)
+
+    Success:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        message:
+          type: string
+          description: Success message
+        data:
+          type: object
+          description: Response data
+
+security: []
