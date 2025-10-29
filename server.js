@@ -22,7 +22,7 @@ const dbConnection = require('./utils/database');
 const { setupSwagger } = require('./swagger');
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 8080;
 
 // Security middleware
 app.use(helmet({
@@ -41,7 +41,9 @@ app.use(helmet({
   },
 }));
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: process.env.NODE_ENV === 'production' 
+    ? [process.env.FRONTEND_URL, 'https://*.onrender.com', 'https://*.vercel.app']
+    : process.env.FRONTEND_URL || 'http://localhost:3000',
   credentials: true
 }));
 
@@ -67,6 +69,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Setup Swagger UI - Professional Documentation
 setupSwagger(app);
+
+// Redirect root path to Swagger docs
+app.get('/', (req, res) => {
+  res.redirect('/api-docs');
+});
 
 // Health check endpoint
 app.get('/health', async (req, res) => {

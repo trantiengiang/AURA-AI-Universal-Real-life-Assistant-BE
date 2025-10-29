@@ -15,7 +15,7 @@
     "db:studio": "npx prisma studio",
     "db:reset": "npx prisma db push --force-reset",
     "demo": "node demo-data.js",
-    "build": "npm install",
+    "build": "npm install && npx prisma generate",
     "postinstall": "npx prisma generate"
   },
   "keywords": [

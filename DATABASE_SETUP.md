@@ -89,3 +89,5 @@ npx prisma db push
 - Kiểm tra firewall cho port 3306
 - Sử dụng MySQL Workbench để test connection
 
+
+

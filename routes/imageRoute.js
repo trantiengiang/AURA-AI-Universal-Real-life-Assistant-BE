@@ -21,3 +21,5 @@ router.get('/sizes', imageController.getImageSizes);
 module.exports = router;
 
 
+
+
