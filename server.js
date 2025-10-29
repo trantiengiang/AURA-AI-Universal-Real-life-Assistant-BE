@@ -145,14 +145,14 @@ app.use('*', (req, res) => {
 app.use(errorHandler);
 
 // Start server
-app.listen(PORT, async () => {
+app.listen(PORT, '0.0.0.0', async () => {
   try {
     // Connect to database
     await dbConnection.connect();
     
     logger.info(`🚀 AURA Backend API running on port ${PORT}`);
     logger.info(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
-    logger.info(`🔗 Health check: http://localhost:${PORT}/health`);
+    logger.info(`🔗 Health check: http://0.0.0.0:${PORT}/health`);
     logger.info(`🗄️ Database: SQL Server connected`);
   } catch (error) {
     logger.error('❌ Failed to start server:', error);
